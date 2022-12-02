@@ -14,6 +14,9 @@ tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 axum = "0.6.0"
 serde = { version = "1.0.148", features = ["derive"] }
 rand = { version = "0.8.5", features = ["min_const_gen"] }
+savefile = "0.11.0"
+savefile-derive = "0.11.0"
+lazy_static = "1.4.0"
 
 [dependencies]
 han-utils = { path = "han-utils" }
@@ -24,3 +27,9 @@ tracing-subscriber = { workspace = true }
 axum = { workspace = true }
 serde = { workspace = true }
 rand = { workspace = true }
+dotenv = "0.15.0"
+static_init = "1.0.3"
+savefile = { workspace = true }
+savefile-derive = { workspace = true }
+lazy_static = { workspace = true }
+reqwest = { version = "0.11.13", features = ["json", "stream"] }

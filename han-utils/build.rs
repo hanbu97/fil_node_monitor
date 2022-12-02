@@ -14,7 +14,7 @@ fn main() {
         chrono::Local::now().to_rfc2822()
     );
 
-    let t: &str = git_version!(args = ["--abbrev=40", "--always"]);
+    let _: &str = git_version!(args = ["--abbrev=40", "--always"]);
     println!(
         "cargo:rustc-env=GIT_VERSION={}",
         git_version!(args = ["--abbrev=40", "--always"])
