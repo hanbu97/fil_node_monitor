@@ -1,0 +1,26 @@
+[package]
+name = "node-monitor"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [".", "han-utils"]
+
+[workspace.dependencies]
+tokio = { version = "1.22.0", features = ["full"] }
+anyhow = "1.0.66"
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+axum = "0.6.0"
+serde = { version = "1.0.148", features = ["derive"] }
+rand = { version = "0.8.5", features = ["min_const_gen"] }
+
+[dependencies]
+han-utils = { path = "han-utils" }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+axum = { workspace = true }
+serde = { workspace = true }
+rand = { workspace = true }

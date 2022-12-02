@@ -1,0 +1,16 @@
+[package]
+name = "han-utils"
+version = "0.1.0"
+edition = "2021"
+description = "a set of utils"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = { workspace = true }
+serde = { workspace = true }
+rand = { workspace = true }
+
+[build-dependencies]
+git-version = "0.3.5"
+chrono = "0.4"
