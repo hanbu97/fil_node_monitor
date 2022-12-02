@@ -12,6 +12,7 @@ lazy_static! {
             Ok(c) => c,
             Err(_) => GlobalConfig {
                 timeouts: GlobalTimeouts::default(),
+                interval: RwLock::new(DEFAULT_INTERVAL),
             },
         };
 
@@ -20,6 +21,7 @@ lazy_static! {
 }
 
 const DEFAULT_TIMEOUT: f32 = 10.;
+const DEFAULT_INTERVAL: f32 = 10.;
 const DEFAULT_CONFIG_FILE: &str = "config.bin";
 lazy_static! {
     pub static ref CONFIG_FILE: String = {
@@ -32,16 +34,20 @@ lazy_static! {
 #[derive(Savefile)]
 pub struct Config {
     pub timeouts: Timeouts,
+    pub interval: f32,
 }
 
 pub struct GlobalConfig {
     pub timeouts: GlobalTimeouts,
+    // interval between two requests
+    pub interval: RwLock<f32>,
 }
 
 impl From<Config> for GlobalConfig {
     fn from(config: Config) -> Self {
         Self {
             timeouts: config.timeouts.into(),
+            interval: config.interval.into(),
         }
     }
 }
@@ -50,6 +56,7 @@ impl GlobalConfig {
     async fn config(&self) -> Config {
         Config {
             timeouts: self.timeouts.config().await,
+            interval: *self.interval.read().await,
         }
     }
 

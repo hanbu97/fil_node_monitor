@@ -1,4 +1,32 @@
+
+
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use tokio::sync::RwLock;
+
+pub struct MinerInfos {
+    pub infos: RwLock<Vec<FilfoxMinerInfo>>,
+}
+
+impl MinerInfos {
+    pub fn new() -> Self {
+        Self {
+            infos: RwLock::new(vec![]),
+        }
+    }
+}
+
+impl From<Vec<FilfoxMinerInfo>> for MinerInfos {
+    fn from(value: Vec<FilfoxMinerInfo>) -> Self {
+        Self {
+            infos: RwLock::new(value),
+        }
+    }
+}
+
+lazy_static! {
+    pub static ref GLOBAL_MINER_INFOS: MinerInfos = MinerInfos::new();
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FilfoxMinerInfo {

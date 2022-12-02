@@ -22,7 +22,7 @@ pub struct GlobalNodes {
 #[derive(Savefile)]
 pub struct Nodes {
     // nodes
-    nodes: Vec<String>,
+    pub nodes: Vec<String>,
 }
 impl From<Nodes> for GlobalNodes {
     fn from(n: Nodes) -> Self {
