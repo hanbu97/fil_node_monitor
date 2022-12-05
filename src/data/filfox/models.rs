@@ -26,6 +26,12 @@ impl MinerInfo {
     }
 }
 
+impl Default for MinerInfo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // String, // 0    name
 // i64,    // 1    timestamp
 // f32,    // 2    pledge
@@ -87,7 +93,7 @@ pub struct MinerInfos {
 impl MinerInfos {
     pub async fn info(&self) -> anyhow::Result<Vec<MinerInfo>> {
         let data = { self.infos.read().await.clone() };
-        let out: Vec<MinerInfo> = data.into_iter().map(|d| MinerInfo::from(d)).collect();
+        let out: Vec<MinerInfo> = data.into_iter().map(MinerInfo::from).collect();
         Ok(out)
     }
 
@@ -97,6 +103,12 @@ impl MinerInfos {
             .read()
             .await
             .to_rfc3339_opts(SecondsFormat::Millis, false))
+    }
+}
+
+impl Default for MinerInfos {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

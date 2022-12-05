@@ -61,7 +61,7 @@ impl GlobalConfig {
     }
 
     pub async fn interval(&self) -> f32 {
-        self.interval.read().await.clone()
+        *self.interval.read().await
     }
 
     pub async fn set_interval(&self, interval: f32) -> anyhow::Result<()> {

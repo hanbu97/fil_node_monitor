@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use chrono::Utc;
+
 use lazy_static::lazy_static;
 use sqlx::{
     migrate::MigrateDatabase,
@@ -145,7 +145,7 @@ async fn test_get_db() -> anyhow::Result<()> {
 #[tokio::test]
 async fn test_insert_db() -> anyhow::Result<()> {
     let db = init_history_db().await?;
-    let timestamp = Utc::now().timestamp();
+    let timestamp = chrono::Utc::now().timestamp();
 
     let item: DealDbType = (
         "test".to_string(),

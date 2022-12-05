@@ -1,10 +1,4 @@
-use crate::data::{
-    filfox::models::MinerInfo,
-    history::{
-        db::get_db,
-        subscribe::{HistoryItem, GLOBAL_HISTORY},
-    },
-};
+use crate::data::{filfox::models::MinerInfo, history::db::get_db};
 
 use super::super::*;
 use axum::{extract::Query, Extension};
@@ -37,7 +31,10 @@ pub async fn post_history(
     }
 }
 
-pub async fn post_history_handler(req: HistoryGetReq, db: SqlitePool) -> anyhow::Result<HistoryGetRes> {
+pub async fn post_history_handler(
+    req: HistoryGetReq,
+    db: SqlitePool,
+) -> anyhow::Result<HistoryGetRes> {
     let (time_vec, info_vec) = get_db(db, req.name.clone(), req.from, req.to).await?;
 
     Ok(HistoryGetRes {

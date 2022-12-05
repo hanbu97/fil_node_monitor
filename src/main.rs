@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::Extension;
 use node_monitor::{
     data::{filfox::update::miner_info_updater, history::db::init_history_db},
