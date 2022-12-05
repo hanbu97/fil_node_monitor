@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use axum::Extension;
 use node_monitor::{
     data::{filfox::update::miner_info_updater, history::db::init_history_db},
     router,
@@ -24,8 +27,6 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn run() -> anyhow::Result<()> {
-    let app = router::init_router().await?;
-
     let port = std::env::var("PORT")
         .expect("Port must be given!")
         .parse::<u16>()
@@ -36,7 +37,10 @@ async fn run() -> anyhow::Result<()> {
     // init history db
     let db = init_history_db().await?;
     // start miner info updater
-    tokio::spawn(async move { miner_info_updater(db).await });
+    let db_clone = db.clone();
+    tokio::spawn(async move { miner_info_updater(db_clone).await });
+
+    let app = router::init_router().await?.layer(Extension(db));
 
     axum::Server::bind(&address)
         .serve(app.into_make_service())

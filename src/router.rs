@@ -21,11 +21,14 @@ pub async fn init_router() -> anyhow::Result<Router> {
             Router::new()
                 .nest(
                     "/history",
-                    Router::new().route("/get",
+                    Router::new().route("/",
                     on(
+                        MethodFilter::GET,
+                        apis::history::get::get_history,
+                    ).on(
                         MethodFilter::POST,
                         apis::history::get::get_history,
-                    ), ).nest(
+                    )).nest(
                         "/subscribe",
                         Router::new()
                             .route(
