@@ -12,6 +12,18 @@ pub struct MinerInfo {
     pub rewards: f64,
 }
 
+impl MinerInfo {
+    pub fn new() -> Self {
+        Self {
+            id: "all".to_string(),
+            pledge: 0.,
+            power: 0.,
+            blocks: 0,
+            rewards: 0.,
+        }
+    }
+}
+
 impl From<FilfoxMinerInfo> for MinerInfo {
     fn from(value: FilfoxMinerInfo) -> Self {
         let pledge: f64 = value.miner.initial_pledge_requirement.parse().unwrap_or(0.);
