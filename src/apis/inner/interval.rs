@@ -1,4 +1,4 @@
-use crate::data::{config::GLOBAL_CONFIG, filfox::models::GLOBAL_MINER_INFOS};
+use crate::data::config::GLOBAL_CONFIG;
 
 use super::super::*;
 

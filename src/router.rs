@@ -20,6 +20,38 @@ pub async fn init_router() -> anyhow::Result<Router> {
             "/api",
             Router::new()
                 .nest(
+                    "/history",
+                    Router::new().route("/get",
+                    on(
+                        MethodFilter::POST,
+                        apis::history::get::get_history,
+                    ), ).nest(
+                        "/subscribe",
+                        Router::new()
+                            .route(
+                                "/add",
+                                on(
+                                    MethodFilter::POST,
+                                    apis::history::subscribe::add::post_history_subscribe_add,
+                                ),
+                            )
+                            .route(
+                                "/delete",
+                                on(
+                                    MethodFilter::POST,
+                                    apis::history::subscribe::delete::post_history_subscribe_delete,
+                                ),
+                            )
+                            .route(
+                                "/",
+                                on(
+                                    MethodFilter::GET,
+                                    apis::history::subscribe::get_history_subscribe,
+                                ),
+                            ),
+                    ),
+                )
+                .nest(
                     "/subscribe",
                     Router::new()
                         .route("/", on(MethodFilter::GET, apis::subscribe::get_subscribe))

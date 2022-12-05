@@ -6,3 +6,4 @@ use serde::{Deserialize, Serialize};
 pub mod info;
 pub mod inner;
 pub mod subscribe;
+pub mod history;
