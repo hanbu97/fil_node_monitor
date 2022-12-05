@@ -36,6 +36,9 @@ pub async fn post_interval_handler(req: IntervalReq) -> anyhow::Result<f32> {
         GLOBAL_CONFIG.set_interval(req.to).await?;
     }
 
+    // save changes
+    GLOBAL_CONFIG.save().await?;
+
     Ok(req.to)
 }
 

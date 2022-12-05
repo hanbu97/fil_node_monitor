@@ -34,3 +34,5 @@ savefile-derive = { workspace = true }
 lazy_static = { workspace = true }
 reqwest = { version = "0.11.13", features = ["json", "stream"] }
 chrono = "0.4.23"
+tower-http = { version = "0.3.5", features = ["cors"] }
+http = "0.2.8"
