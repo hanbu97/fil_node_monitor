@@ -32,13 +32,7 @@ async fn run() -> anyhow::Result<()> {
     let address = std::net::SocketAddr::from((std::net::Ipv4Addr::UNSPECIFIED, port));
     tracing::info!("Running on: {}", address);
 
-    // init history db
-    let db = init_history_db().await?;
-    // start miner info updater
-    let db_clone = db.clone();
-    tokio::spawn(async move { miner_info_updater(db_clone).await });
-
-    let app = router::init_router().await?.layer(Extension(db));
+    let app = router::init_router().await?;
 
     axum::Server::bind(&address)
         .serve(app.into_make_service())

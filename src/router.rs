@@ -1,9 +1,14 @@
+use std::sync::Arc;
+
 use axum::{
-    routing::{on, MethodFilter},
-    Router,
+    routing::{on, post, MethodFilter},
+    Extension, Router,
 };
 
-use crate::apis;
+use crate::{
+    apis,
+    data::{filfox::update::miner_info_updater, history::db::init_history_db},
+};
 
 pub async fn init_router() -> anyhow::Result<Router> {
     use http::Method;
@@ -15,20 +20,36 @@ pub async fn init_router() -> anyhow::Result<Router> {
         // allow requests from any origin
         .allow_origin(Any);
 
+    // init history db
+    let db = init_history_db().await?;
+    // start miner info updater
+    let db_clone = db.clone();
+    tokio::spawn(async move { miner_info_updater(db_clone).await });
+
+    let db_arc = Arc::new(db);
+
+    // .route("/",
+    // on(
+    //     MethodFilter::POST,
+    //     apis::history::post::post_history,
+    // ).on(
+    //     MethodFilter::GET,
+    //     apis::history::get::get_history,
+    // ))
+
     let app = Router::new()
         .nest(
             "/api",
             Router::new()
                 .nest(
                     "/history",
-                    Router::new().route("/",
-                    on(
-                        MethodFilter::GET,
-                        apis::history::get::get_history,
-                    ).on(
-                        MethodFilter::POST,
-                        apis::history::get::get_history,
-                    )).nest(
+                    Router::new()
+                    .route("/", post(apis::history::post::post_history))
+                    .route(
+                        "/",
+                        on(MethodFilter::GET,  apis::history::get::get_history),
+                    )
+                   .nest(
                         "/subscribe",
                         Router::new()
                             .route(

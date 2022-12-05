@@ -7,7 +7,12 @@ use super::{miner_info::download_from_downloadinfo, models::GLOBAL_MINER_INFOS};
 
 pub async fn update_miner_info(conn: SqlitePool) -> anyhow::Result<()> {
     let nodes = GLOBAL_NODES.nodes().await.nodes;
+
     let interval = { *GLOBAL_CONFIG.interval.read().await };
+
+    if nodes.is_empty() {
+        tokio::time::sleep(std::time::Duration::from_secs_f32(interval)).await;
+    }
 
     tracing::info!("polling miner info with interval: {}", interval);
 

@@ -21,7 +21,10 @@ pub async fn post_subscribe_add(
 
 pub async fn post_subscribe_add_handler(req: SubscribeAddReq) -> anyhow::Result<Vec<String>> {
     {
-        GLOBAL_NODES.nodes.write().await.push(req.id);
+        let mut nodes = GLOBAL_NODES.nodes.write().await;
+        if !nodes.contains(&req.id) {
+            nodes.push(req.id);
+        }
     }
     GLOBAL_NODES.save().await?;
     let nodes = GLOBAL_NODES.nodes.read().await.clone();
