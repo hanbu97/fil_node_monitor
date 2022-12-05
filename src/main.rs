@@ -1,4 +1,7 @@
-use node_monitor::{data::filfox::update::miner_info_updater, router};
+use node_monitor::{
+    data::{filfox::update::miner_info_updater, history::db::init_history_db},
+    router,
+};
 
 #[static_init::dynamic]
 static STATIC_HANDLER: () = {
@@ -30,8 +33,10 @@ async fn run() -> anyhow::Result<()> {
     let address = std::net::SocketAddr::from((std::net::Ipv4Addr::UNSPECIFIED, port));
     tracing::info!("Running on: {}", address);
 
+    // init history db
+    let db = init_history_db().await?;
     // start miner info updater
-    tokio::spawn(async move { miner_info_updater().await });
+    tokio::spawn(async move { miner_info_updater(db).await });
 
     axum::Server::bind(&address)
         .serve(app.into_make_service())

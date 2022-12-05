@@ -3,6 +3,8 @@ use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
+use crate::data::history::db::{DealDbType, DealDbTypeFull};
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MinerInfo {
     pub id: String,
@@ -20,6 +22,36 @@ impl MinerInfo {
             power: 0.,
             blocks: 0,
             rewards: 0.,
+        }
+    }
+}
+
+// String, // 0    name
+// i64,    // 1    timestamp
+// f32,    // 2    pledge
+// f32,    // 3    power
+// i64,    // 4    blocks
+// f32,    // 5    rewards
+impl From<DealDbType> for MinerInfo {
+    fn from(value: DealDbType) -> Self {
+        Self {
+            id: "all".to_string(),
+            pledge: value.2,
+            power: value.3,
+            blocks: value.4 as u64,
+            rewards: value.5,
+        }
+    }
+}
+
+impl From<DealDbTypeFull> for MinerInfo {
+    fn from(value: DealDbTypeFull) -> Self {
+        Self {
+            id: "all".to_string(),
+            pledge: value.3,
+            power: value.4,
+            blocks: value.5 as u64,
+            rewards: value.6,
         }
     }
 }

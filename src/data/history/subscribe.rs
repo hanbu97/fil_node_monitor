@@ -11,7 +11,7 @@ use tokio::sync::RwLock;
 #[derive(Savefile, Clone, Serialize, Deserialize, Debug)]
 pub struct HistoryItem {
     pub name: String,
-    pub interval: f32,
+    pub interval: i64,
     pub add_time: i64,
 }
 
@@ -28,6 +28,7 @@ lazy_static! {
 // define data structure
 pub struct GlobalHistory {
     pub history: RwLock<Vec<HistoryItem>>,
+    pub last_update: RwLock<Vec<i64>>,
 }
 
 impl GlobalHistory {
@@ -35,7 +36,17 @@ impl GlobalHistory {
         self.history.read().await.clone()
     }
 
-    pub async fn add(&self, name: String, interval: f32) -> anyhow::Result<()> {
+    pub async fn last_update(&self) -> Vec<i64> {
+        self.last_update.read().await.clone()
+    }
+
+    pub async fn update_time(&self, idx: usize, timestamp: i64) -> anyhow::Result<()> {
+        let mut times = self.last_update.write().await;
+        times[idx] = timestamp;
+        Ok(())
+    }
+
+    pub async fn add(&self, name: String, interval: i64) -> anyhow::Result<()> {
         let current_timestamp = Utc::now().timestamp();
 
         let item = HistoryItem {
@@ -47,6 +58,9 @@ impl GlobalHistory {
         {
             self.history.write().await.push(item);
         }
+        {
+            self.last_update.write().await.push(0);
+        }
 
         // save add subscribe
         self.save().await?;
@@ -56,19 +70,24 @@ impl GlobalHistory {
 
     pub async fn delete(&self, names: Vec<String>) -> anyhow::Result<()> {
         let items = self.get().await;
+        let last_updates = self.last_update().await;
         let mut new_items = vec![];
+        let mut new_last_updates = vec![];
 
-        for item in items {
+        for (item, last) in items.into_iter().zip(last_updates) {
             if names.contains(&item.name) {
                 continue;
             }
-            new_items.push(item)
+            new_items.push(item);
+            new_last_updates.push(last);
         }
 
         {
             *self.history.write().await = new_items;
         }
-
+        {
+            *self.last_update.write().await = new_last_updates;
+        }
         // save add subscribe
         self.save().await?;
 
@@ -92,11 +111,14 @@ impl GlobalHistory {
 pub struct History {
     // history
     pub history: Vec<HistoryItem>,
+    // last_update timestamp
+    pub last_update: Vec<i64>,
 }
 impl From<History> for GlobalHistory {
     fn from(n: History) -> Self {
         Self {
             history: n.history.into(),
+            last_update: n.last_update.into(),
         }
     }
 }
@@ -105,6 +127,7 @@ impl GlobalHistory {
     pub async fn history(&self) -> History {
         History {
             history: self.history.read().await.clone(),
+            last_update: self.last_update.read().await.clone(),
         }
     }
 
@@ -133,6 +156,7 @@ lazy_static! {
             Ok(c) => c,
             Err(_) => GlobalHistory {
                 history: RwLock::new(vec![]),
+                last_update: RwLock::new(vec![]),
             },
         };
 

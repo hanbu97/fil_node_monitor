@@ -18,7 +18,7 @@ pub async fn get_info() -> core::result::Result<Res<GetInfoRes>, Res<String>> {
     }
 }
 
-async fn get_info_handler() -> anyhow::Result<GetInfoRes> {
+pub async fn get_info_handler() -> anyhow::Result<GetInfoRes> {
     let info = GLOBAL_MINER_INFOS.info().await?;
     let last_update = GLOBAL_MINER_INFOS.last_update().await?;
 

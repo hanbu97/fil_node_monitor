@@ -3,7 +3,7 @@ use super::*;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HistorySubscribeAddReq {
     pub name: String,
-    pub interval: f32,
+    pub interval: i64,
 }
 
 pub async fn post_history_subscribe_add(
