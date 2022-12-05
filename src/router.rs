@@ -25,15 +25,22 @@ pub async fn init_router() -> anyhow::Result<Router> {
                         ),
                     ),
             )
+            .route("/info", on(MethodFilter::GET, apis::info::get_info))
             .nest(
                 "/inner",
-                Router::new().route(
-                    "/version",
-                    on(
-                        MethodFilter::GET,
-                        han_utils::apis::inner::version::get_version,
+                Router::new()
+                    .route(
+                        "interval",
+                        on(MethodFilter::GET, apis::inner::interval::get_interval)
+                            .on(MethodFilter::POST, apis::inner::interval::post_interval),
+                    )
+                    .route(
+                        "/version",
+                        on(
+                            MethodFilter::GET,
+                            han_utils::apis::inner::version::get_version,
+                        ),
                     ),
-                ),
             ),
     );
 

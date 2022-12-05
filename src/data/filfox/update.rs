@@ -1,3 +1,5 @@
+use chrono::Local;
+
 use crate::data::{config::GLOBAL_CONFIG, nodes::GLOBAL_NODES};
 
 use super::{miner_info::download_from_downloadinfo, models::GLOBAL_MINER_INFOS};
@@ -5,6 +7,8 @@ use super::{miner_info::download_from_downloadinfo, models::GLOBAL_MINER_INFOS};
 pub async fn update_miner_info() -> anyhow::Result<()> {
     let nodes = GLOBAL_NODES.nodes().await.nodes;
     let interval = { *GLOBAL_CONFIG.interval.read().await };
+
+    tracing::info!("polling miner info with interval: {}", interval);
 
     let gap = interval / nodes.len() as f32;
     let mut infos = vec![];
@@ -18,6 +22,11 @@ pub async fn update_miner_info() -> anyhow::Result<()> {
     }
     {
         *GLOBAL_MINER_INFOS.infos.write().await = infos;
+    }
+
+    let current_time = Local::now();
+    {
+        *GLOBAL_MINER_INFOS.last_update.write().await = current_time;
     }
 
     Ok(())

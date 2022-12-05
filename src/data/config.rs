@@ -60,6 +60,15 @@ impl GlobalConfig {
         }
     }
 
+    pub async fn interval(&self) -> f32 {
+        self.interval.read().await.clone()
+    }
+
+    pub async fn set_interval(&self, interval: f32) -> anyhow::Result<()> {
+        *self.interval.write().await = interval;
+        Ok(())
+    }
+
     pub async fn save(&self) -> anyhow::Result<()> {
         let config: Config = self.config().await;
         save_config(&config);

@@ -1,4 +1,4 @@
-use node_monitor::router;
+use node_monitor::{data::filfox::update::miner_info_updater, router};
 
 #[static_init::dynamic]
 static STATIC_HANDLER: () = {
@@ -29,6 +29,9 @@ async fn run() -> anyhow::Result<()> {
         .expect("Port must be a number!");
     let address = std::net::SocketAddr::from((std::net::Ipv4Addr::UNSPECIFIED, port));
     tracing::info!("Running on: {}", address);
+
+    // start miner info updater
+    tokio::spawn(async move { miner_info_updater().await });
 
     axum::Server::bind(&address)
         .serve(app.into_make_service())

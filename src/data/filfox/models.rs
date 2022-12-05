@@ -1,16 +1,65 @@
-
-
+use chrono::{DateTime, Local, SecondsFormat};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MinerInfo {
+    pub id: String,
+    pub pledge: f64,
+    pub power: f64,
+    pub blocks: u64,
+    pub rewards: f64,
+}
+
+impl From<FilfoxMinerInfo> for MinerInfo {
+    fn from(value: FilfoxMinerInfo) -> Self {
+        let pledge: f64 = value.miner.initial_pledge_requirement.parse().unwrap_or(0.);
+        let pledge = pledge / (1.0e18);
+
+        let rewards = value.miner.total_rewards.parse().unwrap_or(0.);
+        let rewards = rewards / (1.0e18);
+
+        let power = value.miner.quality_adj_power.parse().unwrap_or(0.);
+        let power = power / 1024. / 1024. / 1024. / 1024.;
+
+        let blocks = value.miner.weighted_blocks_mined;
+
+        Self {
+            id: value.id,
+            pledge,
+            power,
+            blocks: blocks as u64,
+            rewards,
+        }
+    }
+}
+
 pub struct MinerInfos {
+    pub last_update: RwLock<DateTime<Local>>,
     pub infos: RwLock<Vec<FilfoxMinerInfo>>,
+}
+
+impl MinerInfos {
+    pub async fn info(&self) -> anyhow::Result<Vec<MinerInfo>> {
+        let data = { self.infos.read().await.clone() };
+        let out: Vec<MinerInfo> = data.into_iter().map(|d| MinerInfo::from(d)).collect();
+        Ok(out)
+    }
+
+    pub async fn last_update(&self) -> anyhow::Result<String> {
+        Ok(self
+            .last_update
+            .read()
+            .await
+            .to_rfc3339_opts(SecondsFormat::Millis, false))
+    }
 }
 
 impl MinerInfos {
     pub fn new() -> Self {
         Self {
+            last_update: RwLock::new(Local::now()),
             infos: RwLock::new(vec![]),
         }
     }
@@ -19,6 +68,7 @@ impl MinerInfos {
 impl From<Vec<FilfoxMinerInfo>> for MinerInfos {
     fn from(value: Vec<FilfoxMinerInfo>) -> Self {
         Self {
+            last_update: RwLock::new(Local::now()),
             infos: RwLock::new(value),
         }
     }
@@ -28,7 +78,7 @@ lazy_static! {
     pub static ref GLOBAL_MINER_INFOS: MinerInfos = MinerInfos::new();
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FilfoxMinerInfo {
     pub actor: String,
     pub address: String,
@@ -53,7 +103,7 @@ pub struct FilfoxMinerInfo {
     pub worker_miners: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Miner {
     #[serde(rename = "availableBalance")]
     pub available_balance: String,
@@ -98,19 +148,19 @@ pub struct Miner {
     pub worker: Worker,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ControlAddress {
     pub address: String,
     pub balance: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Owner {
     pub address: String,
     pub balance: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Sectors {
     pub active: i64,
     pub faulty: i64,
@@ -118,7 +168,7 @@ pub struct Sectors {
     pub recovering: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Worker {
     pub address: String,
     pub balance: String,
