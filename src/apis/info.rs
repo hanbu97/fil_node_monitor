@@ -30,6 +30,9 @@ async fn get_info_handler() -> anyhow::Result<GetInfoRes> {
         total.rewards += i.rewards;
     }
 
-
-    Ok(GetInfoRes { info, last_update, total})
+    Ok(GetInfoRes {
+        info,
+        last_update,
+        total,
+    })
 }

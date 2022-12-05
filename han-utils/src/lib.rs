@@ -1,4 +1,4 @@
-pub mod crypto;
-pub mod res;
 pub mod apis;
+pub mod crypto;
 pub mod data;
+pub mod res;
